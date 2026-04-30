@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Waypoint Learning — The Special Education Challenge</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --ink: #1a1a1a;
+    --paper: #faf9f6;
+    --accent: #2563eb;
+    --accent-light: #dbeafe;
+    --muted: #6b7280;
+    --border: #e5e5e5;
+    --code-bg: #f3f4f6;
+    --highlight: #fef3c7;
+    --green: #059669;
+    --green-light: #d1fae5;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Source Serif 4', Georgia, serif;
+    color: var(--ink);
+    background: var(--paper);
+    line-height: 1.7;
+    font-size: 17px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 6rem;
+  }
+
+  .header {
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .header .company {
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+  }
+
+  h1 {
+    font-size: 2.2rem;
+    line-height: 1.2;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    letter-spacing: -0.02em;
+  }
+
+  .subtitle {
+    font-size: 1.1rem;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .meta-bar {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    padding: 1rem 1.25rem;
+    background: var(--accent-light);
+    border-radius: 6px;
+    margin-bottom: 2.5rem;
+    font-size: 0.9rem;
+  }
+
+  .meta-item { display: flex; align-items: center; gap: 0.4rem; }
+  .meta-label { font-weight: 600; color: var(--accent); }
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  h3 { font-size: 1.15rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+  p { margin-bottom: 1rem; }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.88em;
+    background: var(--code-bg);
+    padding: 0.15em 0.4em;
+    border-radius: 3px;
+  }
+
+  ul, ol { margin-bottom: 1rem; padding-left: 1.5rem; }
+  li { margin-bottom: 0.4rem; }
+
+  .callout { padding: 1.25rem 1.5rem; border-radius: 6px; margin-bottom: 1.5rem; }
+  .callout-blue { background: var(--accent-light); border-left: 4px solid var(--accent); }
+  .callout strong { display: block; margin-bottom: 0.25rem; }
+
+  .eval-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+  .eval-item { padding: 1rem 1.25rem; background: var(--code-bg); border-radius: 6px; }
+  .eval-item .label { font-weight: 600; font-size: 0.95rem; margin-bottom: 0.25rem; }
+  .eval-item .desc { font-size: 0.9rem; color: var(--muted); }
+
+  .prize-box { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
+  .prize { flex: 1; padding: 1.25rem; border-radius: 6px; text-align: center; }
+  .prize-winner { background: var(--accent); color: white; }
+  .prize-top { background: var(--accent-light); color: var(--accent); }
+  .prize .amount { font-size: 1.5rem; font-weight: 700; display: block; margin-bottom: 0.25rem; }
+  .prize .detail { font-size: 0.85rem; }
+
+  .steps { counter-reset: step; list-style: none; padding-left: 0; }
+  .steps li { counter-increment: step; padding-left: 2.5rem; position: relative; margin-bottom: 0.75rem; }
+  .steps li::before {
+    content: counter(step);
+    position: absolute; left: 0; top: 0.15em;
+    width: 1.6rem; height: 1.6rem;
+    background: var(--accent); color: white; border-radius: 50%;
+    font-size: 0.8rem; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  hr { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+
+  .footer { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.95rem; }
+  .footer p { margin-bottom: 0.5rem; }
+
+  @media (max-width: 600px) {
+    h1 { font-size: 1.7rem; }
+    .eval-grid { grid-template-columns: 1fr; }
+    .prize-box { flex-direction: column; }
+    .meta-bar { flex-direction: column; gap: 0.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <div class="company">Waypoint Learning</div>
+    <h1>The Special Education Challenge</h1>
+    <p class="subtitle">Build an MCP server that helps a teacher differentiate instruction for students with Individualized Education Plans (IEPs).</p>
+  </div>
+
+  <div class="meta-bar">
+    <div class="meta-item"><span class="meta-label">Timeline:</span> 72 hours</div>
+    <div class="meta-item"><span class="meta-label">Prize:</span> $500 cash (winner)</div>
+    <div class="meta-item"><span class="meta-label">Stack:</span> MCP + Claude + TypeScript/Python</div>
+    <div class="meta-item"><span class="meta-label">Deadline:</span> Wednesday, May 6</div>
+  </div>
+
+  <h2>The Problem</h2>
+  <p>Almost 10 million students in the U.S. have Individualized Education Programs (IEPs), legally binding 20+ page documents that describe exactly what a student needs in the classroom every day. But most teachers can't act on them well. Not because they don't care, but the support is lacking.</p>
+  <p>To differentiate a lesson for a student with an IEP, you need to understand the curriculum deeply, understand the student's specific goals and accommodations, and then figure out how to adapt a specific lesson. It's a complex task that special education teachers need to spend hours on when they only have minutes.</p>
+  <p>This is where AI can make a real difference: not generating generic worksheets but actually reasoning about the intersection of a curriculum, a lesson, and a student's specific needs.</p>
+
+  <h2>The Challenge</h2>
+  <p>Build an MCP server that connects to Claude and helps a teacher differentiate instruction. We'll provide sample lessons and a sample (anonymized) IEP. Your server should take the lesson and provide the teachers with specific strategies and resources to support the student in the classroom. The product should give a teacher what they need to support that student with a click of a button rather than hours of prep.</p>
+
+  <h3>What you'll build</h3>
+  <ul>
+    <li>An MCP server (TypeScript or Python) that exposes curriculum docs and IEP data as resources/tools to Claude</li>
+    <li>The server should enable Claude to reason about the specific lesson content and the specific student needs, and produce concrete, actionable modifications</li>
+    <li>Think: scaffolded questions, modified materials, alternative assessments, accommodation reminders — things a teacher can actually use. Feel free to research about Universal Design of Learning (UDL) practices and other pedagogical principles.</li>
+  </ul>
+
+  <h3>What we'll provide</h3>
+  <ul>
+    <li>Sample lessons (a few lessons from a real K-8 curriculum)</li>
+    <li>Sample IEP document (anonymized)</li>
+  </ul>
+
+  <div class="callout callout-blue">
+    <strong>A note on scope</strong>
+    <p style="margin-bottom: 0;">This is intentionally open-ended. There's no single "right" architecture. We want to see how you think about structuring domain data for an LLM: what becomes a resource, what becomes a tool, how you handle context, and whether the output is actually useful to a teacher. A thoughtful, well-structured solution that handles one lesson well is better than a sprawling system that handles many lessons poorly.</p>
+  </div>
+
+  <h2>Evaluation Criteria</h2>
+  <div class="eval-grid">
+    <div class="eval-item">
+      <div class="label">Output quality</div>
+      <div class="desc">Are the instructional modifications specific, actionable, and grounded in both the curriculum and the IEP?</div>
+    </div>
+    <div class="eval-item">
+      <div class="label">Architecture decisions</div>
+      <div class="desc">How did you structure curriculum and IEP data for Claude? What trade-offs did you make and why?</div>
+    </div>
+    <div class="eval-item">
+      <div class="label">Code quality</div>
+      <div class="desc">Clean, readable, well-organized. Comments where they matter, and tests if you have time.</div>
+    </div>
+    <div class="eval-item">
+      <div class="label">Domain understanding</div>
+      <div class="desc">Does the solution show you thought about what a teacher actually needs, not just what's technically interesting?</div>
+    </div>
+  </div>
+
+  <h2>Prizes &amp; Outcomes</h2>
+  <div class="prize-box">
+    <div class="prize prize-winner">
+      <span class="amount">Winner</span>
+      <span class="detail">$500 cash prize</span>
+    </div>
+    <div class="prize prize-top">
+      <span class="amount">Top 5</span>
+      <span class="detail">Interview for founding engineer role at Waypoint Learning</span>
+    </div>
+  </div>
+
+  <h2>How to Submit</h2>
+  <ol class="steps">
+    <li>On <strong>Saturday, May 2 @ 12pm ET</strong>, we will post a GitHub repo with the sample lessons and IEP. Clone or fork that repo to get started.</li>
+    <li>Build your MCP server solution</li>
+    <li>Push your code to a public GitHub repo</li>
+    <li>Email <strong>Isaac@waypoint-learning.org</strong> with the subject line <strong>"Waypoint Challenge: [Your Name]"</strong> and a link to your repo</li>
+    <li>Deadline: <strong>Wednesday, May 6 @ 12pm ET</strong></li>
+  </ol>
+
+  <hr>
+
+  <h2>About the Role</h2>
+  <p>We're looking for a founding engineer who wants to build the technical foundation of a company that could genuinely change how millions of students experience school. You'd be working directly with me (Isaac) to go from MVP to full product.</p>
+  <p>The work involves building AI-powered tools for teachers — ingesting and understanding curriculum, reasoning about IEPs, generating actionable instructional modifications, automating reporting workflows, and creating tight feedback loops so teachers know what's working. The stack is early and flexible.</p>
+  <p>This role is ideal for a strong new grad or junior engineer who wants massive ownership, cares about education, and is excited about building with LLMs in a domain where the work genuinely matters.</p>
+
+  <h2>About Waypoint Learning</h2>
+  <p>Waypoint is building AI tools that help teachers serve students with disabilities — not just faster paperwork, but fundamentally better instruction. We believe the highest leverage point in education is the teacher, and the hardest thing teachers do is differentiate instruction for students with diverse learning needs. We're building the tools to make that possible.</p>
+  <p>Founder &amp; CEO: Isaac Goldstein (Stanford CS and Harvard MBA) spent five years inside the education system at EY-Parthenon, BCG, and Great Minds, where he designed and led a 330-person implementation team.</p>
+
+  <div class="footer">
+    <p>Questions? Email <strong>Isaac@waypoint-learning.org</strong></p>
+  </div>
+
+</div>
+</body>
+</html>
