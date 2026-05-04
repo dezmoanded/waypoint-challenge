@@ -53,7 +53,7 @@ This is intentionally open-ended. There's no single "right" architecture. We wan
 ### Setup
 
 ```bash
-git clone https://github.com/waypoint-learning/waypoint-challenge.git
+git clone https://github.com/igoldstein19/waypoint-challenge.git
 cd waypoint-challenge
 ```
 
