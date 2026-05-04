@@ -38,7 +38,9 @@ The architecture is up to you. Some questions worth thinking through:
 - How do you ground modifications in *both* the curriculum and the IEP, rather than producing generic strategies?
 - What does the teacher actually see and how to they easily navigate the UI/UX of the tool? 
 
-Feel free to research [Universal Design for Learning (UDL)] and other pedagogical frameworks. The ability to learn quickly is part of what we're evaluating.
+Feel free to research Universal Design for Learning (UDL) and other pedagogical frameworks. The ability to learn quickly is part of what we're evaluating.
+
+This is intentionally open-ended. There's no single "right" architecture. We want to see how you think about structuring domain data for an LLM: what becomes a resource, what becomes a tool, how you handle context, and whether the output is actually useful to a teacher. A thoughtful, well-structured solution that handles one lesson well is better than a sprawling system that handles many lessons poorly.
 
 ## Getting Started
 
@@ -100,6 +102,14 @@ Comment in HN or email isaac@waypoint-learning.org.
 ## A Note on the Data
 
 Please don't redistribute these materials outside the context of this challenge.
+
+## About the Role
+
+We're looking for a founding engineer who wants to build the technical foundation of a company that could genuinely change how millions of students experience school. You'd be working directly with me (Isaac) to go from MVP to full product.
+
+The work involves building AI-powered tools for teachers — ingesting and understanding curriculum, reasoning about IEPs, generating actionable instructional modifications, automating reporting workflows, and creating tight feedback loops so teachers know what's working. The stack is early and flexible.
+
+This role is ideal for a strong new grad or junior engineer who wants massive ownership, cares about education, and is excited about building with LLMs in a domain where the work genuinely matters.
 
 ## About Waypoint Learning
 
