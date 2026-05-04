@@ -1,4 +1,4 @@
-# Waypoint Challenge: The Special Education Starter Kit
+# Waypoint Learning: The Special Education Challenge
 
 Build an MCP server that helps a teacher differentiate instruction for a student with an Individualized Education Program (IEP).
 
