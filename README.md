@@ -113,6 +113,6 @@ This role is ideal for a strong new grad or junior engineer who wants massive ow
 
 ## About Waypoint Learning
 
-Waypoint is building AI tools that help teachers serve students with disabilities — not just faster paperwork, but fundamentally better instruction. We believe the highest-leverage point in education is the teacher, and the hardest thing teachers do is differentiate instruction for students with diverse learning needs.
+Waypoint is building AI tools that help teachers serve students with disabilities by both streamlining administrative work and supporting fundamentally better instruction. We believe the highest-leverage point in education is the teacher, and the hardest thing teachers do is differentiate instruction for students with diverse learning needs.
 
 Founder & CEO: Isaac Goldstein studied CS at Stanford and is finishing is MBA at Harvard. He hasive years in education at EY-Parthenon, BCG, and Great Minds, where he led a 330-person curriculum implementation team - and he's looking to partner with a great engineer to build a very impactful business.
