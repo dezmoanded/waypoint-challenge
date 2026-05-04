@@ -112,8 +112,21 @@
   .eval-item .label { font-weight: 600; font-size: 0.95rem; margin-bottom: 0.25rem; }
   .eval-item .desc { font-size: 0.9rem; color: var(--muted); }
 
-  .prize-box { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
-  .prize { flex: 1; padding: 1.25rem; border-radius: 6px; text-align: center; }
+.prize-box { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
+.prize {
+  flex: 1;
+  padding: 1.25rem;
+  border-radius: 6px;
+  text-align: center;
+  line-height: 1.3;                /* tightens vertical spacing */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;          /* vertically centers contents */
+}
+.prize-winner { background: var(--accent); color: white; }
+.prize-top { background: var(--accent-light); color: var(--accent); }
+.prize .amount { font-size: 1.5rem; font-weight: 700; display: block; margin-bottom: 0.4rem; }
+.prize .detail { font-size: 0.85rem; }
   .prize-winner { background: var(--accent); color: white; }
   .prize-top { background: var(--accent-light); color: var(--accent); }
   .prize .amount { font-size: 1.5rem; font-weight: 700; display: block; margin-bottom: 0.25rem; }
