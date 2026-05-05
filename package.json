@@ -1,0 +1,30 @@
+{
+  "name": "waypoint-challenge",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/server.ts",
+    "dev:http": "tsx src/http.ts",
+    "build": "tsc --noEmit",
+    "extract:iep": "tsx src/pdf/extractIepSections.ts iep.pdf",
+    "extract:lesson": "tsx src/pdf/extractLessonText.ts lesson/lesson.pdf",
+    "test:pdf": "tsx src/pdf/extractIepSections.test.ts && tsx src/pdf/extractLessonText.test.ts",
+    "test:llm": "tsx src/llm/extractLessonModel.test.ts && tsx src/llm/summarizeIepSection.test.ts",
+    "test:mcp": "tsx src/mcp/tools/getIepSection.test.ts",
+    "test:all": "npm run test:pdf && npm run test:llm && npm run test:mcp",
+    "check": "npm run build && npm run test:all"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.93.0",
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "pdf-parse": "^1.1.1",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3",
+    "@types/pdf-parse": "^1.1.5"
+  }
+}

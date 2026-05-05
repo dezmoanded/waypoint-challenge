@@ -1,118 +1,189 @@
-# Waypoint Learning: The Special Education Challenge
+# Waypoint Challenge
 
-Build an MCP server that helps a teacher differentiate instruction for a student with an Individualized Education Program (IEP).
+This repo contains a TypeScript MCP server that helps an LLM generate teacher-ready instructional modifications grounded in a lesson and a student's IEP.
 
-**Prize:** $500 to the winner. Top 5 submissions get an immediate final-round interview for the founding engineer role at Waypoint Learning The challenge is designed to take no more than a few hours.
+The server supports two transports:
+- stdio for local MCP clients like Claude Desktop
+- HTTP for remote/web MCP clients like ChatGPT (typically via an HTTPS tunnel such as ngrok)
 
-**Deadline:** Monday, May 11 @ 12pm ET
+## Current Status
+- MCP server over stdio in `src/server.ts`
+- HTTP MCP entrypoint in `src/http.ts` (for ChatGPT/remote clients)
+- Shared MCP surface factored in `src/mcp/app.ts` (resources, tools, prompts)
+- PDF extraction utilities under `src/pdf`
+
+## MCP Server Surface
+- Resources: `lesson://raw`, `lesson://model`, `iep://summary`
+- Tool: `get_iep_section(section, goalId?)`
+- Prompt: `differentiate_lesson_for_student(lessonUri, iepUri, focus?)`
+
+## Project Structure
+- `src/server.ts` — stdio MCP server entrypoint (Claude Desktop)
+- `src/http.ts` — HTTP MCP server entrypoint (ChatGPT/remote)
+- `src/mcp/app.ts` — shared MCP server registration (resources, tools, prompts)
+- `src/pdf/extractIepSections.ts` — PDF text extraction and IEP section splitting
+- `src/pdf/extractLessonText.ts` — lesson PDF raw-text extraction
+- `src/pdf/shared.ts` — shared PDF parsing helpers
+- `src/llm/extractLessonModel.ts` — Claude-powered lesson model extractor (requires Anthropic API key)
+- `iep.pdf`, `lesson.pdf` — sample PDFs in repo root
+
+## Installation
+
+```bash
+npm install
+```
+
+## Configuration
+Environment variables commonly used by this project:
+- `LESSON_PDF_PATH` — path to the lesson PDF (default: `lesson.pdf` in repo root)
+- `IEP_PDF_PATH` — path to the IEP PDF (default: `iep.pdf` in repo root)
+- `ANTHROPIC_API_KEY` — required for Claude-powered features (e.g., `src/llm/extractLessonModel.ts`)
+
+Additional env for the HTTP server (optional):
+- `PORT` — default `3000`
+- `HOST` — default `127.0.0.1`
+- `MCP_PATH` — default `/mcp`
+
+Examples (macOS/Linux):
+```bash
+export ANTHROPIC_API_KEY="sk-ant-…"
+export LESSON_PDF_PATH="$PWD/lesson.pdf"
+export IEP_PDF_PATH="$PWD/iep.pdf"
+```
+
+Windows PowerShell:
+```powershell
+$env:ANTHROPIC_API_KEY = "sk-ant-…"
+$env:LESSON_PDF_PATH = "$PWD\lesson.pdf"
+$env:IEP_PDF_PATH = "$PWD\iep.pdf"
+```
+
+## Commands
+- Run stdio MCP server (Claude Desktop): `npm run dev`
+- Run HTTP MCP server (ChatGPT/remote): `npm run dev:http`
+  - Examples:
+    - `PORT=3000 npm run dev:http`
+    - `HOST=0.0.0.0 MCP_PATH=/mcp npm run dev:http`
+- Type-check only: `npx tsc --noEmit`
+- Full check: `npm run check`
 
 ---
 
-## The Challenge
+## Claude Desktop via stdio (recommended for Claude)
+Use the stdio transport when connecting from Claude Desktop.
 
-Almost 10 million U.S. students have IEPs — legally binding documents that describe exactly what a student needs in the classroom every day. But teachers can't act on them well, because translating a 20+ page IEP into a modified version of tomorrow's lesson takes hours of prep they don't have.
-
-Your job: build an MCP server that gives Claude the context it needs to help a teacher do this in minutes instead of hours.
-
-Given a lesson and a student's IEP, the system should produce **specific, actionable instructional modifications** — scaffolded questions, modified materials, alternative assessments, accommodation reminders. Things a teacher can actually use in the classroom.
-
-## What's in This Repo
-
-lesson/           # Sample lesson from a real K-8 curriculum
-
-iep/              # Sample IEP document (anonymized)
-
-README.md
-
-## What You'll Build
-
-An MCP server (TypeScript or Python) that:
-
-1. Exposes the curriculum and IEP data to Claude as resources and/or tools
-2. Lets Claude reason about the intersection of a specific lesson and a specific student's needs
-3. Produces concrete modifications a teacher can use without further editing
-
-The architecture is up to you. Some questions worth thinking through:
-
-- How do you chunk and surface the IEP so Claude can reason about goals, accommodations, and present levels effectively?
-- How do you ground modifications in *both* the curriculum and the IEP, rather than producing generic strategies?
-- What does the teacher actually see and how to they easily navigate the UI/UX of the tool? 
-
-Feel free to research Universal Design for Learning (UDL) and other pedagogical frameworks. The ability to learn quickly is part of what we're evaluating.
-
-This is intentionally open-ended. There's no single "right" architecture. We want to see how you think about structuring domain data for an LLM: what becomes a resource, what becomes a tool, how you handle context, and whether the output is actually useful to a teacher. A thoughtful, well-structured solution that handles one lesson well is better than a sprawling system that handles many lessons poorly.
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js 18+ (for TypeScript) **or** Python 3.10+ (for Python)
-- An Anthropic API key or Claude Desktop installed
-- Familiarity with the [Model Context Protocol]
-
-### Setup
-
+1) Start the server (development)
 ```bash
-git clone https://github.com/igoldstein19/waypoint-challenge.git
-cd waypoint-challenge
+npm run dev
 ```
 
-## Evaluation Criteria
+2) Configure Claude Desktop
+Add an entry to your Claude Desktop config (update paths/keys):
 
-We'll evaluate submissions on four dimensions:
+Config file locations:
+- macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- Windows: `%APPDATA%/Claude/claude_desktop_config.json`
+- Linux: `~/.config/Claude/claude_desktop_config.json`
 
-| Dimension | What we're looking for |
-|---|---|
-| **Output quality** | Are the instructional modifications specific, actionable, and grounded in both the curriculum and the IEP? Would a real teacher use this? |
-| **Architecture decisions** | How did you structure curriculum and IEP data for Claude? What trade-offs did you make and why? Your README should explain this. |
-| **Code quality** | Clean, readable, well-organized. Comments where they matter. Tests if you have time. |
-| **Domain understanding** | Does the solution reflect real thinking about what a teacher needs, not just what's technically interesting? How did you provide additional context that increased the quality of output? |
+Example config:
+```json
+{
+  "mcpServers": {
+    "waypoint-challenge": {
+      "command": "npx",
+      "args": ["tsx", "/absolute/path/to/repo/src/server.ts"],
+      "env": {
+        "LESSON_PDF_PATH": "/absolute/path/to/repo/lesson.pdf",
+        "IEP_PDF_PATH": "/absolute/path/to/repo/iep.pdf",
+        "ANTHROPIC_API_KEY": "sk-ant-..."
+      },
+      "autoStart": true
+    }
+  }
+}
+```
 
-## How to Submit
+After restart, Claude Desktop should discover:
+- resources: `lesson://raw`, `lesson://model`, `iep://summary`
+- tool: `get_iep_section`
+- prompt: `differentiate_lesson_for_student`
 
-1. Push your code to a **public GitHub repo**
-2. Include a README that:
-   - Explains how to run your server
-   - Walks through your architecture decisions
-   - Shows 1-2 example outputs (lesson + IEP → modifications)
-3. Email **isaac@waypoint-learning.org** with:
-   - Subject: `Waypoint Challenge: [Your Name]`
-   - A link to your repo
-   - (Optional) A short demo video
+Notes:
+- GUI apps typically do not inherit your shell environment; prefer the `env` block above.
+- Logging is configured to avoid interfering with stdio I/O.
 
-**Deadline: Monday, May 11 @ 12pm ET.** Late submissions won't be considered.
+---
 
-## FAQ
+## ChatGPT via HTTP + ngrok (for remote/web MCP clients)
+Use the HTTP transport when connecting from ChatGPT or other remote/web-based MCP clients that require an HTTPS endpoint.
 
-**Can I use models other than Claude?**
-Yes, feel free.
+1) Start the HTTP MCP server
+```bash
+npm run dev:http
+```
+Optional overrides:
+```bash
+PORT=3000 HOST=127.0.0.1 MCP_PATH=/mcp npm run dev:http
+```
+Health check (local):
+```
+http://127.0.0.1:3000/health
+```
+MCP endpoint (local):
+```
+http://127.0.0.1:3000/mcp
+```
 
-**Can I team up?**
-Solo submissions only for this round.
+2) Expose your local server with ngrok
+In a separate terminal:
+```bash
+ngrok http 3000
+```
+Copy the public HTTPS URL, for example:
+```
+https://abc123.ngrok-free.app
+```
 
-**What if it's taking too long?**
-A focused, partial solution with clear thinking beats nothing.
+3) Connect ChatGPT to your MCP server
+In ChatGPT’s MCP/custom server UI:
+- Base URL: your ngrok HTTPS URL (e.g., `https://abc123.ngrok-free.app`)
+- MCP endpoint path: `/mcp`
+- Full endpoint most clients expect: `https://abc123.ngrok-free.app/mcp`
 
-**Can I use additional libraries / RAG / fine-tuning / etc.?**
-Yes. Use whatever helps you build the best solution.
+Keep ngrok running while ChatGPT is connected. If the ngrok URL changes (free plan), update it in ChatGPT.
 
-**I have a question that isn't here.**
-Comment in HN or email isaac@waypoint-learning.org.
+Session management:
+- The HTTP transport uses `mcp-session-id` under the hood. Modern clients (like ChatGPT) persist this automatically.
 
-## A Note on the Data
+4) Optional: sanity checks
+Health:
+```bash
+curl -s https://abc123.ngrok-free.app/health
+```
+Initial POST (client normally handles this):
+```bash
+curl -X POST https://abc123.ngrok-free.app/mcp \
+  -H "content-type: application/json" \
+  -d "{}"
+```
+Subsequent requests should include the `mcp-session-id` returned by the server (your MCP client will handle this).
 
-Please don't redistribute these materials outside the context of this challenge.
+---
 
-## About the Role
+## Which transport should I use?
+- Claude Desktop: stdio (`npm run dev`)
+- ChatGPT/remote clients: HTTP + ngrok (`npm run dev:http`, then tunnel)
 
-We're looking for a founding engineer who wants to build the technical foundation of a company that could genuinely change how millions of students experience school. You'd be working directly with me (Isaac) to go from MVP to full product.
+Both entrypoints expose the same resources, tools, and prompts; only the transport differs.
 
-The work involves building AI-powered tools for teachers — ingesting and understanding curriculum, reasoning about IEPs, generating actionable instructional modifications, automating reporting workflows, and creating tight feedback loops so teachers know what's working. The stack is early and flexible.
+## Troubleshooting
+- If Claude Desktop does not see the server, double-check the absolute path in the `args` array and verify environment variables are set in the config.
+- If ChatGPT cannot connect:
+  - Confirm the local health endpoint works (e.g., `http://127.0.0.1:3000/health`).
+  - Confirm your ngrok tunnel is running and using HTTPS.
+  - Ensure your client is pointing at the full MCP path (e.g., `/mcp`).
+  - If you bound `HOST` to `127.0.0.1`, ngrok still works; you generally do not need `0.0.0.0` unless running in certain containerized environments.
 
-This role is ideal for a strong engineer who wants massive ownership, cares about education, and is excited about building with LLMs in a domain where the work genuinely matters.
-
-## About Waypoint Learning
-
-Waypoint is building AI tools that help teachers serve students with disabilities by both streamlining administrative work and supporting fundamentally better instruction. We believe the highest-leverage point in education is the teacher, and the hardest thing teachers do is differentiate instruction for students with diverse learning needs.
-
-Founder & CEO: Isaac Goldstein studied CS at Stanford and is finishing is MBA at Harvard. He hasive years in education at EY-Parthenon, BCG, and Great Minds, where he led a 330-person curriculum implementation team - and he's looking to partner with a great engineer to build a very impactful business.
+## Security & Privacy
+- Do not commit secrets. Use environment variables or a local `.env` that is not checked in.
+- Anonymize student data; avoid reproducing sensitive IEP content except what’s necessary for provenance.
