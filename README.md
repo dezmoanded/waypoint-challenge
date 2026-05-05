@@ -2,24 +2,22 @@
 
 This repo contains a TypeScript MCP server that helps an LLM generate teacher-ready instructional modifications grounded in a lesson and a student's IEP.
 
-The server supports two transports:
-- stdio for local MCP clients like Claude Desktop
-- HTTP for remote/web MCP clients like ChatGPT (typically via an HTTPS tunnel such as ngrok)
+Transport support
+- stdio only (for local MCP clients such as Claude Desktop and Codex)
+- HTTP endpoint exists in code but is not supported/documented for ChatGPT (ChatGPT does not support MCP)
 
 ## Current Status
 - MCP server over stdio in `src/server.ts`
-- HTTP MCP entrypoint in `src/http.ts` (for ChatGPT/remote clients)
 - Shared MCP surface factored in `src/mcp/app.ts` (resources, tools, prompts)
 - PDF extraction utilities under `src/pdf`
 
 ## MCP Server Surface
 - Resources: `lesson://raw`, `lesson://model`, `iep://summary`
-- Tool: `get_iep_section(section, goalId?)`
+- Tools: `get_iep_section`, `get_lesson_raw`, `get_lesson_model`, `get_iep_summary`, `get_differentiate_lesson_prompt`
 - Prompt: `differentiate_lesson_for_student(lessonUri, iepUri, focus?)`
 
 ## Project Structure
-- `src/server.ts` — stdio MCP server entrypoint (Claude Desktop)
-- `src/http.ts` — HTTP MCP server entrypoint (ChatGPT/remote)
+- `src/server.ts` — stdio MCP server entrypoint (Claude Desktop and Codex)
 - `src/mcp/app.ts` — shared MCP server registration (resources, tools, prompts)
 - `src/pdf/extractIepSections.ts` — PDF text extraction and IEP section splitting
 - `src/pdf/extractLessonText.ts` — lesson PDF raw-text extraction
@@ -39,11 +37,6 @@ Environment variables commonly used by this project:
 - `IEP_PDF_PATH` — path to the IEP PDF (default: `iep.pdf` in repo root)
 - `ANTHROPIC_API_KEY` — required for Claude-powered features (e.g., `src/llm/extractLessonModel.ts`)
 
-Additional env for the HTTP server (optional):
-- `PORT` — default `3000`
-- `HOST` — default `127.0.0.1`
-- `MCP_PATH` — default `/mcp`
-
 Examples (macOS/Linux):
 ```bash
 export ANTHROPIC_API_KEY="sk-ant-…"
@@ -59,27 +52,22 @@ $env:IEP_PDF_PATH = "$PWD\iep.pdf"
 ```
 
 ## Commands
-- Run stdio MCP server (Claude Desktop): `npm run dev`
-- Run HTTP MCP server (ChatGPT/remote): `npm run dev:http`
-  - Examples:
-    - `PORT=3000 npm run dev:http`
-    - `HOST=0.0.0.0 MCP_PATH=/mcp npm run dev:http`
+- Run stdio MCP server: `npm run dev`
 - Type-check only: `npx tsc --noEmit`
 - Full check: `npm run check`
 
 ---
 
-## Claude Desktop via stdio (recommended for Claude)
-Use the stdio transport when connecting from Claude Desktop.
+## Connect via stdio
+Use the stdio transport for both Claude Desktop and Codex.
 
+### Claude Desktop (stdio)
 1) Start the server (development)
 ```bash
 npm run dev
 ```
 
 2) Configure Claude Desktop
-Add an entry to your Claude Desktop config (update paths/keys):
-
 Config file locations:
 - macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
 - Windows: `%APPDATA%/Claude/claude_desktop_config.json`
@@ -105,84 +93,46 @@ Example config:
 
 After restart, Claude Desktop should discover:
 - resources: `lesson://raw`, `lesson://model`, `iep://summary`
-- tool: `get_iep_section`
+- tools: `get_iep_section`, `get_lesson_raw`, `get_lesson_model`, `get_iep_summary`, `get_differentiate_lesson_prompt`
 - prompt: `differentiate_lesson_for_student`
 
 Notes:
 - GUI apps typically do not inherit your shell environment; prefer the `env` block above.
-- Logging is configured to avoid interfering with stdio I/O.
+- Logging is routed away from stdout to avoid interfering with stdio I/O.
+
+### Codex (stdio)
+Codex also uses stdio. To avoid `npx`/PATH issues, point Codex to your local `tsx` binary and set the working directory to the repo root.
+
+Recommended configuration (conceptual fields; adjust to Codex UI):
+- command: `/absolute/path/to/repo/node_modules/.bin/tsx`
+- args: `["src/server.ts"]`
+- workingDirectory: `/absolute/path/to/repo`
+- env:
+  - `LESSON_PDF_PATH`: `/absolute/path/to/repo/lesson.pdf`
+  - `IEP_PDF_PATH`: `/absolute/path/to/repo/iep.pdf`
+  - `ANTHROPIC_API_KEY`: `sk-ant-...`
+
+Alternative (direct Node with tsx loader):
+- command: `/path/to/node` (prefer Node 20 or 22 LTS)
+- args: `["--loader", "tsx/loader", "src/server.ts"]`
+- workingDirectory and env as above
 
 ---
 
-## ChatGPT via HTTP + ngrok (for remote/web MCP clients)
-Use the HTTP transport when connecting from ChatGPT or other remote/web-based MCP clients that require an HTTPS endpoint.
+## MCP Inspector (stdio sanity check)
+Use the official inspector to verify the server surface over stdio.
 
-1) Start the HTTP MCP server
 ```bash
-npm run dev:http
+npx @modelcontextprotocol/inspector connect-stdio "npx tsx src/server.ts"
 ```
-Optional overrides:
-```bash
-PORT=3000 HOST=127.0.0.1 MCP_PATH=/mcp npm run dev:http
-```
-Health check (local):
-```
-http://127.0.0.1:3000/health
-```
-MCP endpoint (local):
-```
-http://127.0.0.1:3000/mcp
-```
+You should see the registered resources and tools listed.
 
-2) Expose your local server with ngrok
-In a separate terminal:
-```bash
-ngrok http 3000
-```
-Copy the public HTTPS URL, for example:
-```
-https://abc123.ngrok-free.app
-```
-
-3) Connect ChatGPT to your MCP server
-In ChatGPT’s MCP/custom server UI:
-- Base URL: your ngrok HTTPS URL (e.g., `https://abc123.ngrok-free.app`)
-- MCP endpoint path: `/mcp`
-- Full endpoint most clients expect: `https://abc123.ngrok-free.app/mcp`
-
-Keep ngrok running while ChatGPT is connected. If the ngrok URL changes (free plan), update it in ChatGPT.
-
-Session management:
-- The HTTP transport uses `mcp-session-id` under the hood. Modern clients (like ChatGPT) persist this automatically.
-
-4) Optional: sanity checks
-Health:
-```bash
-curl -s https://abc123.ngrok-free.app/health
-```
-Initial POST (client normally handles this):
-```bash
-curl -X POST https://abc123.ngrok-free.app/mcp \
-  -H "content-type: application/json" \
-  -d "{}"
-```
-Subsequent requests should include the `mcp-session-id` returned by the server (your MCP client will handle this).
-
----
-
-## Which transport should I use?
-- Claude Desktop: stdio (`npm run dev`)
-- ChatGPT/remote clients: HTTP + ngrok (`npm run dev:http`, then tunnel)
-
-Both entrypoints expose the same resources, tools, and prompts; only the transport differs.
-
-## Troubleshooting
-- If Claude Desktop does not see the server, double-check the absolute path in the `args` array and verify environment variables are set in the config.
-- If ChatGPT cannot connect:
-  - Confirm the local health endpoint works (e.g., `http://127.0.0.1:3000/health`).
-  - Confirm your ngrok tunnel is running and using HTTPS.
-  - Ensure your client is pointing at the full MCP path (e.g., `/mcp`).
-  - If you bound `HOST` to `127.0.0.1`, ngrok still works; you generally do not need `0.0.0.0` unless running in certain containerized environments.
+## Troubleshooting (stdio)
+- If the client cannot see tools/resources:
+  - Verify with the inspector (above). If inspector works, check the client’s command, args, and workingDirectory.
+  - Avoid `npx` in Codex; prefer the absolute `node_modules/.bin/tsx` path.
+  - Ensure `LESSON_PDF_PATH` and `IEP_PDF_PATH` point to real files (or rely on defaults `lesson.pdf` and `iep.pdf` in repo root).
+- ExperimentalWarning lines you may see on Node 23 come via stderr and do not affect the MCP JSON stream. Use Node 22 LTS to silence them if desired.
 
 ## Security & Privacy
 - Do not commit secrets. Use environment variables or a local `.env` that is not checked in.

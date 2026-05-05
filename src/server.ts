@@ -12,7 +12,15 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 
 import { createMcpServer } from "./mcp/app.js";
 
+const truthy = new Set(["1", "true", "yes", "on"]); // simple env parser
+const shouldLog =
+  truthy.has(String(process.env.DEBUG).toLowerCase()) ||
+  truthy.has(String(process.env.VERBOSE).toLowerCase()) ||
+  truthy.has(String(process.env.WAYPOINT_DEBUG).toLowerCase());
+
 const logConfiguredPaths = () => {
+  if (!shouldLog) return; // be quiet by default in stdio mode
+
   const lessonPath = process.env.LESSON_PDF_PATH ?? "lesson.pdf";
   const iepPath = process.env.IEP_PDF_PATH ?? "iep.pdf";
 
