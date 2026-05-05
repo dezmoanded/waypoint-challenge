@@ -14,6 +14,33 @@ The output is a Differentiated Lesson Pack that a teacher can use immediately wi
 
 ---
 
+## Table of Contents
+
+- [Example Output](#example-output)
+- [Key Insight](#key-insight)
+- [What This Server Does](#what-this-server-does-outcome-first)
+- [Why This Approach Works](#why-this-approach-works)
+- [MCP Architecture Overview](#mcp-architecture-overview)
+- [Data Flow](#data-flow)
+- [Quick Start](#quick-start-stdio-only)
+- [Evaluation Criteria Alignment](#evaluation-criteria-alignment)
+
+---
+
+## Example Output
+
+See: Differentiated Lesson Pack generated from sample lesson + IEP.
+
+- Jasmine example: [examples/differentiated_lesson_pack_jasmine.md](examples/differentiated_lesson_pack_jasmine.md)
+
+Key properties:
+- task-level modifications
+- explicit scaffolds
+- teacher scripts
+- grounded references
+
+---
+
 ## Key Insight
 
 IEPs are not documents teachers need to read—they are constraint systems describing how a student can and cannot engage with instructional tasks.
@@ -204,20 +231,6 @@ This prevents:
 - Depth over breadth (one lesson, done well)
 - Minimal architecture (no overengineering)
 - Teacher usability over technical novelty
-
----
-
-## Example Output
-
-See: Differentiated Lesson Pack generated from sample lesson + IEP.
-
-- Jasmine example: [examples/differentiated_lesson_pack_jasmine.md](examples/differentiated_lesson_pack_jasmine.md)
-
-Key properties:
-- task-level modifications
-- explicit scaffolds
-- teacher scripts
-- grounded references
 
 ---
 
